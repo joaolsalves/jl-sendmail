@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:property": "vitest run tests/property",
