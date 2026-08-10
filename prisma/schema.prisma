@@ -1,0 +1,61 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  name       String    @db.VarChar(100)
+  keyHash    String    @unique @db.Char(64)
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+
+  emailLogs  EmailLog[]
+  rateLimits RateLimit[]
+
+  @@index([active])
+  @@map("api_keys")
+}
+
+model EmailLog {
+  id           String      @id @default(uuid())
+  apiKeyId     String
+  recipient    String      @db.VarChar(254)
+  subject      String      @db.VarChar(255)
+  status       EmailStatus
+  messageId    String?     @db.VarChar(255)
+  ipAddress    String      @db.VarChar(45)
+  errorMessage String?     @db.Text
+  createdAt    DateTime    @default(now())
+
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  @@index([apiKeyId, createdAt(sort: Desc)])
+  @@index([apiKeyId, id])
+  @@map("email_logs")
+}
+
+model RateLimit {
+  apiKeyId    String
+  windowStart DateTime
+  count       Int      @default(0)
+
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  @@id([apiKeyId, windowStart])
+  @@map("rate_limits")
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+}
