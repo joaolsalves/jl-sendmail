@@ -22,7 +22,31 @@ API REST segura para envio de e-mails transacionais via SMTP da Hostinger.
 
 ---
 
-## Instalação
+## Ambientes
+
+| Ambiente | URL base |
+|----------|----------|
+| Local (dev) | `http://localhost:3000` |
+| Produção (Hostinger) | `https://sendmail.jldatainfo.com` |
+
+### Variáveis por ambiente
+
+**Local (`.env`):**
+```
+DATABASE_URL="mysql://root:Mirdell@%23123@localhost:3307/db_sendmail"
+ALLOWED_ORIGINS=http://localhost:3000,https://sendmail.jldatainfo.com
+PORT=3000
+```
+
+**Produção (painel Hostinger ou `.env.production`):**
+```
+DATABASE_URL="mysql://user:senha@localhost:3306/db_sendmail"
+ALLOWED_ORIGINS=https://sendmail.jldatainfo.com
+PORT=3000
+```
+
+---
+
 
 ```bash
 git clone https://github.com/seu-usuario/email-api.git
