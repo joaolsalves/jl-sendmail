@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "node scripts/generate-env.js",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
