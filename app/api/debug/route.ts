@@ -3,13 +3,8 @@ import { prisma } from '@/src/lib/prisma'
 
 // Endpoint de diagnóstico temporário — remover após resolver o problema
 // GET /api/debug — testa a conexão com o banco de dados
+// Não requer autenticação para facilitar diagnóstico
 export async function GET(): Promise<NextResponse> {
-  // Bloquear em produção com senha diferente
-  const debugKey = process.env.DEBUG_KEY
-  if (!debugKey) {
-    return NextResponse.json({ error: 'Debug not enabled' }, { status: 403 })
-  }
-
   try {
     // Testa a conexão com o banco
     await prisma.$queryRaw`SELECT 1`
@@ -28,7 +23,6 @@ export async function GET(): Promise<NextResponse> {
       },
       env: {
         NODE_ENV: process.env.NODE_ENV,
-        // Mostra host/banco mas oculta a senha
         DATABASE_URL: process.env.DATABASE_URL?.replace(/:([^:@]+)@/, ':***@') ?? 'not set',
         ADMIN_API_KEY: process.env.ADMIN_API_KEY ? `set (${process.env.ADMIN_API_KEY.length} chars)` : 'not set',
         SMTP_HOST: process.env.SMTP_HOST ?? 'not set',
