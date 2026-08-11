@@ -1,0 +1,287 @@
+{
+  "info": {
+    "name": "Email API — JL DataInfo",
+    "description": "API REST para envio de e-mails transacionais via SMTP Hostinger.\n\nVariáveis de ambiente:\n- `base_url`: URL base da API\n- `admin_key`: ADMIN_API_KEY\n- `api_key`: API Key do cliente (gerada via POST /api-keys)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url_local",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "base_url_prod",
+      "value": "https://sendmail.jldatainfo.com",
+      "type": "string"
+    },
+    {
+      "key": "base_url",
+      "value": "https://sendmail.jldatainfo.com",
+      "type": "string",
+      "description": "Altere para {{base_url_local}} para testar localmente"
+    },
+    {
+      "key": "admin_key",
+      "value": "b65e5f1a59e8e750abd9830c61d7dbcc89485fbeaffa3d13f3c3ab802b0dc3e5",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "",
+      "type": "string",
+      "description": "Preencher após criar uma API Key via POST /api/v1/api-keys"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Verifica se a API está online. Não requer autenticação."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin — API Keys",
+      "item": [
+        {
+          "name": "POST /api/v1/api-keys — Criar API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meu Sistema\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "api-keys"]
+            },
+            "description": "Cria uma nova API Key. A chave (key) é exibida apenas uma vez na resposta — guarde-a."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v1/api-keys — Com expiração",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sistema Temporário\",\n  \"expiresAt\": \"2025-12-31T23:59:59.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "api-keys"]
+            },
+            "description": "Cria uma API Key com data de expiração."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/api-keys — Listar API Keys",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "api-keys"]
+            },
+            "description": "Lista todas as API Keys (sem expor o hash)."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/v1/api-keys/:id — Revogar API Key",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/api-keys/ID_DA_CHAVE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "api-keys", "ID_DA_CHAVE"]
+            },
+            "description": "Revoga (desativa) uma API Key. Substitua ID_DA_CHAVE pelo id retornado na criação."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Email",
+      "item": [
+        {
+          "name": "POST /api/v1/email/send — Enviar e-mail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"destinatario@exemplo.com\",\n  \"subject\": \"Teste via API\",\n  \"html\": \"<h1>Olá!</h1><p>E-mail enviado pela Email API.</p>\",\n  \"text\": \"Olá! E-mail enviado pela Email API.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/email/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "email", "send"]
+            },
+            "description": "Envia um e-mail transacional. Requer api_key configurada na variável de ambiente da collection."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/v1/email/send — Com from customizado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_key}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"destinatario@exemplo.com\",\n  \"subject\": \"Teste com from customizado\",\n  \"html\": \"<h1>Olá!</h1>\",\n  \"from\": \"contato@jldatainfo.com\",\n  \"replyTo\": \"responder@jldatainfo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/email/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "email", "send"]
+            },
+            "description": "Envia e-mail com remetente e replyTo personalizados."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/email/logs — Listar logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/email/logs?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "email", "logs"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Lista os logs de e-mail da API Key autenticada com paginação."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/v1/email/logs/:id — Buscar log individual",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_key}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/email/logs/ID_DO_LOG",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "email", "logs", "ID_DO_LOG"]
+            },
+            "description": "Retorna um log específico. Substitua ID_DO_LOG pelo id retornado na listagem."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
