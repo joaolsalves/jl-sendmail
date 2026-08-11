@@ -28,7 +28,29 @@ export function loadConfig(): AppConfig {
     process.stderr.write(
       `[env] Missing or invalid environment variables: ${missing}\n`
     )
-    process.exit(1)
+    // Em produção, logar mas não derrubar o processo — o app retorna 503 nas rotas afetadas
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1)
+    }
+    // Retornar config parcial com valores vazios para produção
+    return {
+      database: { url: process.env.DATABASE_URL ?? '' },
+      smtp: {
+        host: process.env.SMTP_HOST ?? '',
+        port: parseInt(process.env.SMTP_PORT ?? '465'),
+        user: process.env.SMTP_USER ?? '',
+        pass: process.env.SMTP_PASS ?? '',
+        from: process.env.SMTP_FROM ?? '',
+      },
+      auth: { adminApiKey: process.env.ADMIN_API_KEY ?? '' },
+      cors: {
+        allowedOrigins: (process.env.ALLOWED_ORIGINS ?? 'http://localhost:3000')
+          .split(',')
+          .map((o) => o.trim())
+          .filter(Boolean),
+      },
+      server: { port: parseInt(process.env.PORT ?? '3000') },
+    }
   }
 
   const env = result.data
